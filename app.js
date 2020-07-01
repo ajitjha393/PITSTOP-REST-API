@@ -21,4 +21,7 @@ app.use((req, res, next) => {
 
 app.use('/feed', feedRoutes)
 
-app.listen(8080, 'localhost', () => console.log('Connnected'))
+app.listen(8080, 'localhost', () => {
+	console.clear()
+	console.log('Connnected')
+})
