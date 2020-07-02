@@ -25,6 +25,18 @@ app.use((req, res, next) => {
 })
 
 app.use('/feed', feedRoutes)
+
+// General Express Error Handling middleware
+app.use((err, req, res, next) => {
+	console.log(err)
+	const statusCode = err.statusCode || 500
+	const message = err.message
+
+	return res.status(statusCode).json({
+		message,
+	})
+})
+
 // Connecting to DB
 
 console.log(credentials)
