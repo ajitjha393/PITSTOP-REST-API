@@ -21,10 +21,13 @@ exports.getPosts = (req, res, next) => {
 exports.postAddPost = async (req, res, next) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
-		return res.status(422).json({
-			message: 'Validation Failed, Entered Data is incorrect',
-			errors: errors.array(),
-		})
+		const err = new Error('Validation Failed, Entered Data is incorrect')
+		err.statusCode = 422
+		return next(err)
+		// return res.status(422).json({
+		// 	message: 'Validation Failed, Entered Data is incorrect',
+		// 	errors: errors.array(),
+		// })
 	}
 
 	const { title, content } = { ...req.body }
@@ -50,6 +53,10 @@ exports.postAddPost = async (req, res, next) => {
 			post: resPost,
 		})
 	} catch (err) {
-		console.log(err)
+		if (!err.statusCode) {
+			err.statusCode = 500
+		}
+
+		next(err)
 	}
 }
