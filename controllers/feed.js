@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator/check')
+const Post = require('../models/post')
 
 exports.getPosts = (req, res, next) => {
 	// 200 means success
@@ -17,7 +18,7 @@ exports.getPosts = (req, res, next) => {
 	})
 }
 
-exports.postAddPost = (req, res, next) => {
+exports.postAddPost = async (req, res, next) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
 		return res.status(422).json({
@@ -30,17 +31,25 @@ exports.postAddPost = (req, res, next) => {
 
 	// Create posts in db
 
-	// 201 Success in creating a resource in backend
-	res.status(201).json({
-		message: 'Post created Successfully',
-		post: {
-			_id: new Date().toISOString(),
-			title,
-			content,
-			creator: {
-				name: 'Bishwajit',
-			},
-			createdAt: new Date(),
+	const post = new Post({
+		title,
+		content,
+		imageUrl: 'images/duck.jpg',
+		creator: {
+			name: 'Bishwajit',
 		},
 	})
+
+	try {
+		const resPost = await post.save()
+		console.log(resPost)
+
+		// 201 Success in creating a resource in backend
+		res.status(201).json({
+			message: 'Post created Successfully',
+			post: resPost,
+		})
+	} catch (err) {
+		console.log(err)
+	}
 }
