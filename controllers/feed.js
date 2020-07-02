@@ -24,10 +24,12 @@ exports.postAddPost = async (req, res, next) => {
 		const err = new Error('Validation Failed, Entered Data is incorrect')
 		err.statusCode = 422
 		return next(err)
-		// return res.status(422).json({
-		// 	message: 'Validation Failed, Entered Data is incorrect',
-		// 	errors: errors.array(),
-		// })
+	}
+
+	if (!req.file) {
+		const err = new Error('No image Provided...')
+		err.statusCode = 422
+		return next(err)
 	}
 
 	const { title, content } = { ...req.body }
@@ -37,7 +39,7 @@ exports.postAddPost = async (req, res, next) => {
 	const post = new Post({
 		title,
 		content,
-		imageUrl: 'images/duck.jpg',
+		imageUrl: req.file.path,
 		creator: {
 			name: 'Bishwajit',
 		},
