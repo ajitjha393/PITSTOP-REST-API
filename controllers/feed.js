@@ -1,21 +1,21 @@
 const { validationResult } = require('express-validator/check')
 const Post = require('../models/post')
 
-exports.getPosts = (req, res, next) => {
+exports.getPosts = async (req, res, next) => {
 	// 200 means success
-	res.status(200).json({
-		posts: [
-			{
-				title: 'First Post',
-				content: 'This is first Post!',
-				imageUrl: 'images/duck.jpg',
-				creator: {
-					name: 'Bishwajit',
-				},
-				createdAt: new Date(),
-			},
-		],
-	})
+	try {
+		const posts = await Post.find()
+		res.status(200).json({
+			message: 'All posts fetched Successfully',
+			posts,
+		})
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500
+		}
+
+		next(err)
+	}
 }
 
 exports.postAddPost = async (req, res, next) => {
