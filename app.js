@@ -19,6 +19,18 @@ const fileStorage = multer.diskStorage({
 	},
 })
 
+const fileFilter = (req, file, cb) => {
+	if (
+		file.mimetype === 'image/png' ||
+		file.mimetype === 'image/jpg' ||
+		file.mimetype === 'image/jpeg'
+	) {
+		cb(null, true)
+	} else {
+		cb(null, false)
+	}
+}
+
 // app.use(bodyParser.urlencoded()) /*This works when data is submitted through form*/
 
 app.use(bodyParser.json()) /** application/json */
