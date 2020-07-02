@@ -5,7 +5,7 @@ exports.getPosts = async (req, res, next) => {
 	// 200 means success
 	try {
 		const posts = await Post.find()
-		res.status(200).json({
+		return res.status(200).json({
 			message: 'All posts fetched Successfully',
 			posts,
 		})
@@ -50,7 +50,7 @@ exports.postAddPost = async (req, res, next) => {
 		console.log(resPost)
 
 		// 201 Success in creating a resource in backend
-		res.status(201).json({
+		return res.status(201).json({
 			message: 'Post created Successfully',
 			post: resPost,
 		})
