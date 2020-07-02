@@ -5,8 +5,19 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const { credentials } = require('./utils/credentials')
 const path = require('path')
+const multer = require('multer')
 
 const app = express()
+
+const fileStorage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, 'images')
+	},
+
+	filename: (req, file, cb) => {
+		cb(null, new Date().toISOString() + '-' + file.originalname)
+	},
+})
 
 // app.use(bodyParser.urlencoded()) /*This works when data is submitted through form*/
 
