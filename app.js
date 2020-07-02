@@ -4,12 +4,15 @@ const feedRoutes = require('./routes/feed')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const { credentials } = require('./utils/credentials')
+const path = require('path')
 
 const app = express()
 
-// app.use(bodyParser.urlencoded()) /*Thi works when data is submitted through form*/
+// app.use(bodyParser.urlencoded()) /*This works when data is submitted through form*/
 
 app.use(bodyParser.json()) /** application/json */
+
+app.use('/images', express.static(path.join(__dirname, 'images')))
 
 app.use((req, res, next) => {
 	res.setHeader('Access-Control-Allow-Origin', '*')
