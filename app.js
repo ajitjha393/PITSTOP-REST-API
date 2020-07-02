@@ -2,6 +2,8 @@ const express = require('express')
 
 const feedRoutes = require('./routes/feed')
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+const { credentials } = require('./utils/credentials')
 
 const app = express()
 
@@ -20,8 +22,15 @@ app.use((req, res, next) => {
 })
 
 app.use('/feed', feedRoutes)
+// Connecting to DB
 
-app.listen(8080, 'localhost', () => {
-	console.clear()
-	console.log('Connnected')
-})
+console.log(credentials)
+mongoose
+	.connect(credentials)
+	.then((_) => {
+		app.listen(8080, 'localhost', () => {
+			console.clear()
+			console.log('Connnected')
+		})
+	})
+	.catch((err) => console.log(err))
