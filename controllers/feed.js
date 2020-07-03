@@ -141,6 +141,36 @@ exports.updatePost = async (req, res, next) => {
 	}
 }
 
+exports.deletePost = async (req, res, next) => {
+	try {
+		const postId = req.body.postId
+
+		const post = await Post.findById(postId)
+		if (!post) {
+			const err = new Error('Could Not Find a post.')
+			err.statusCode = 404
+			throw err
+		}
+		// Check for user of post and logged in user
+		/** Will add that later */
+
+		clearImage(post.imageUrl)
+
+		const result = await Post.findByIdAndRemove(postId)
+
+		return res.status(200).json({
+			message: 'Post Deleted Successfully',
+			post: result,
+		})
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500
+		}
+
+		next(err)
+	}
+}
+
 const clearImage = (filepath) => {
 	filepath = path.join(__dirname, '..', filepath)
 	fs.unlink(filepath, (err) => console.log(err))

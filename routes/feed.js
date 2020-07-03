@@ -5,6 +5,7 @@ const {
 	postAddPost,
 	getPost,
 	updatePost,
+	deletePost,
 } = require('../controllers/feed')
 
 const { body } = require('express-validator/check')
@@ -31,5 +32,7 @@ router.put(
 	],
 	updatePost
 )
+
+router.delete('/post/:postId', deletePost)
 
 module.exports = router
