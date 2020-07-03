@@ -60,9 +60,11 @@ app.use((err, req, res, next) => {
 	console.log(err)
 	const statusCode = err.statusCode || 500
 	const message = err.message
+	const data = err.data
 
 	return res.status(statusCode).json({
 		message,
+		data,
 	})
 })
 
