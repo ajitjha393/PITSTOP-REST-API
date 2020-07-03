@@ -1,6 +1,7 @@
 const express = require('express')
 
 const feedRoutes = require('./routes/feed')
+const authRoutes = require('./routes/auth')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const { credentials } = require('./utils/credentials')
@@ -52,6 +53,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/feed', feedRoutes)
+app.use('/auth', authRoutes)
 
 // General Express Error Handling middleware
 app.use((err, req, res, next) => {
