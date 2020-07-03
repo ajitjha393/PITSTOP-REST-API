@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator/check')
 const Post = require('../models/post')
+const path = require('path')
+const fs = require('fs')
 
 exports.getPosts = async (req, res, next) => {
 	// 200 means success
@@ -84,4 +86,62 @@ exports.getPost = async (req, res, next) => {
 
 		next(err)
 	}
+}
+
+exports.updatePost = async (req, res, next) => {
+	const postId = req.params.postId
+
+	const errors = validationResult(req)
+	if (!errors.isEmpty()) {
+		const err = new Error('Validation Failed, Entered Data is incorrect')
+		err.statusCode = 422
+		return next(err)
+	}
+
+	const title = req.body.title
+	const content = req.body.content
+	let imageUrl = req.body.image
+
+	if (req.file) {
+		imageUrl = req.file.path
+	}
+
+	if (!imageUrl) {
+		const err = new Error('No file picked...')
+		err.statusCode = 422
+		return next(err)
+	}
+
+	try {
+		const post = await Post.findById(postId)
+		if (!post) {
+			const err = new Error('Could Not Find a post.')
+			err.statusCode = 404
+			throw err
+		}
+		if (imageUrl !== post.imageUrl) {
+			clearImage(post.imageUrl)
+		}
+		post.title = title
+		post.content = content
+		post.imageUrl = imageUrl
+
+		const result = await post.save()
+
+		return res.status(200).json({
+			message: 'Post Updated',
+			post: result,
+		})
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500
+		}
+
+		next(err)
+	}
+}
+
+const clearImage = (filepath) => {
+	filepath = path.join(__dirname, '..', filepath)
+	fs.unlink(filepath, (err) => console.log(err))
 }
