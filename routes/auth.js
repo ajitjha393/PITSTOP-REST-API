@@ -13,7 +13,7 @@ router.put(
 			.isEmail()
 			.withMessage('Please Enter a Valid Email')
 			.custom(async (emailVal, { req }) => {
-				if (!(await User.findOne({ email: emailVal }))) {
+				if (await User.findOne({ email: emailVal })) {
 					throw new Error('Email already exists...')
 				}
 				return true
