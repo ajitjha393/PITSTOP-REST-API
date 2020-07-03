@@ -6,10 +6,19 @@ const fs = require('fs')
 exports.getPosts = async (req, res, next) => {
 	// 200 means success
 	try {
+		const currentPage = req.query.page || 1
+		const perPage = 2
+
+		let totalItems = await Post.find().countDocuments()
+
 		const posts = await Post.find()
+			.skip((currentPage - 1) * perPage)
+			.limit(perPage)
+
 		return res.status(200).json({
 			message: 'All posts fetched Successfully',
 			posts,
+			totalItems,
 		})
 	} catch (err) {
 		if (!err.statusCode) {
