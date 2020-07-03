@@ -143,7 +143,7 @@ exports.updatePost = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
 	try {
-		const postId = req.body.postId
+		const postId = req.params.postId
 
 		const post = await Post.findById(postId)
 		if (!post) {
