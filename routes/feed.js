@@ -8,11 +8,13 @@ const {
 	deletePost,
 } = require('../controllers/feed')
 
+const isAuth = require('../middleware/is-auth')
+
 const { body } = require('express-validator/check')
 
 const router = Router()
 
-router.get('/posts', getPosts)
+router.get('/posts', isAuth, getPosts)
 router.post(
 	'/post',
 	[
