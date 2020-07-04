@@ -17,6 +17,7 @@ const router = Router()
 router.get('/posts', isAuth, getPosts)
 router.post(
 	'/post',
+	isAuth,
 	[
 		body('title').trim().isLength({ min: 5 }),
 		body('content').trim().isLength({ min: 5 }),
@@ -24,10 +25,11 @@ router.post(
 	postAddPost
 )
 
-router.get('/post/:postId', getPost)
+router.get('/post/:postId', isAuth, getPost)
 
 router.put(
 	'/post/:postId',
+	isAuth,
 	[
 		body('title').trim().isLength({ min: 5 }),
 		body('content').trim().isLength({ min: 5 }),
@@ -35,6 +37,6 @@ router.put(
 	updatePost
 )
 
-router.delete('/post/:postId', deletePost)
+router.delete('/post/:postId', isAuth, deletePost)
 
 module.exports = router
