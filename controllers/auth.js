@@ -1,6 +1,7 @@
 const User = require('../models/user')
 const { validationResult } = require('express-validator/check')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 exports.signup = async (req, res, next) => {
 	try {
@@ -36,7 +37,7 @@ exports.signup = async (req, res, next) => {
 	}
 }
 
-exports.signup = async (req, res, next) => {
+exports.login = async (req, res, next) => {
 	try {
 		const email = req.body.email
 		const password = req.body.password
@@ -55,6 +56,22 @@ exports.signup = async (req, res, next) => {
 		}
 
 		// Now here will manage JSON web token for managing authentication
+
+		const token = jwt.sign(
+			{
+				email: user.email,
+				userId: user._id.toString(),
+			},
+			'pitstopSecretKey',
+			{
+				expiresIn: '1h',
+			}
+		)
+
+		return res.status(200).json({
+			token: token,
+			userId: user._id.toString(),
+		})
 	} catch {
 		if (!err.statusCode) {
 			err.statusCode = 500
