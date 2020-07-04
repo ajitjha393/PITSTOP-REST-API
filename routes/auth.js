@@ -1,6 +1,6 @@
 const { Router } = require('express')
 
-const { signup } = require('../controllers/auth')
+const { signup, login } = require('../controllers/auth')
 
 const { body } = require('express-validator/check')
 const User = require('../models/user')
@@ -25,5 +25,7 @@ router.put(
 	],
 	signup
 )
+
+router.post('/login', login)
 
 module.exports = router

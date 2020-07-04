@@ -35,3 +35,31 @@ exports.signup = async (req, res, next) => {
 		next(err)
 	}
 }
+
+exports.signup = async (req, res, next) => {
+	try {
+		const email = req.body.email
+		const password = req.body.password
+
+		const user = await User.findOne({ email: email })
+		if (!user) {
+			const err = new Error('Cannot find User with this email!')
+			err.statusCode = 401 //status code for unauthenticated
+			throw err
+		}
+
+		if (!(await bcrypt.compare(password, user.password))) {
+			const err = new Error('Wrong Password!')
+			err.statusCode = 401
+			throw err
+		}
+
+		// Now here will manage JSON web token for managing authentication
+	} catch {
+		if (!err.statusCode) {
+			err.statusCode = 500
+		}
+
+		next(err)
+	}
+}
