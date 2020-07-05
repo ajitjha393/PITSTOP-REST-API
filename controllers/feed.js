@@ -138,6 +138,13 @@ exports.updatePost = async (req, res, next) => {
 			err.statusCode = 404
 			throw err
 		}
+
+		if (post.creator.toString() !== req.userId.toString()) {
+			const err = new Error('Not Authorized for Editing This Product')
+			err.statusCode = 403 //Operation forbidden
+			throw err
+		}
+
 		if (imageUrl !== post.imageUrl) {
 			clearImage(post.imageUrl)
 		}
@@ -170,9 +177,11 @@ exports.deletePost = async (req, res, next) => {
 			err.statusCode = 404
 			throw err
 		}
-		// Check for user of post and logged in user
-		/** Will add that later */
-
+		if (post.creator.toString() !== req.userId.toString()) {
+			const err = new Error('Not Authorized for Deleting This Product')
+			err.statusCode = 403 //Operation forbidden
+			throw err
+		}
 		clearImage(post.imageUrl)
 
 		const result = await Post.findByIdAndRemove(postId)
