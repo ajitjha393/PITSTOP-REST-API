@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator/check')
 const Post = require('../models/post')
+const User = require('../models/user')
 const path = require('path')
 const fs = require('fs')
 
@@ -47,23 +48,32 @@ exports.postAddPost = async (req, res, next) => {
 
 	// Create posts in db
 
+	// Changed Creator from {name: 'Bishwajit'} to userId storedd in req
 	const post = new Post({
 		title,
 		content,
 		imageUrl: req.file.path,
-		creator: {
-			name: 'Bishwajit',
-		},
+		creator: req.userId,
 	})
 
 	try {
 		const resPost = await post.save()
 		console.log(resPost)
 
+		// Adding the new post to the posts array
+		const user = await User.findById(req.userId)
+
+		user.posts.push(resPost)
+		await user.save()
+
 		// 201 Success in creating a resource in backend
 		return res.status(201).json({
 			message: 'Post created Successfully',
 			post: resPost,
+			creator: {
+				_id: user._id,
+				name: user.name,
+			},
 		})
 	} catch (err) {
 		if (!err.statusCode) {
