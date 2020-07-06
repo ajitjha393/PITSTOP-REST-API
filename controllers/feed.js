@@ -3,6 +3,7 @@ const Post = require('../models/post')
 const User = require('../models/user')
 const path = require('path')
 const fs = require('fs')
+const io = require('../socket')
 
 exports.getPosts = async (req, res, next) => {
 	// 200 means success
@@ -65,6 +66,8 @@ exports.postAddPost = async (req, res, next) => {
 
 		user.posts.push(resPost)
 		await user.save()
+
+		io.getIO().emit('posts', { action: 'create', post: resPost })
 
 		// 201 Success in creating a resource in backend
 		return res.status(201).json({
