@@ -78,9 +78,10 @@ mongoose
 			console.clear()
 			console.log('Server Listening to port...')
 		})
+
 		// This uses our http server to establish websocket
 		const io = require('socket.io')(server)
-		io.connect('connection', (socket) => {
+		io.on('connection', (socket) => {
 			console.log('[Websocket] Client connected...')
 		})
 	})
