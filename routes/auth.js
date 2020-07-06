@@ -1,13 +1,20 @@
 const { Router } = require('express')
 
-const { signup, login } = require('../controllers/auth')
+const {
+	signup,
+	login,
+	updateUserStatus,
+	getUserStatus,
+} = require('../controllers/auth')
 
 const { body } = require('express-validator/check')
+const isAuth = require('../middleware/is-auth')
 const User = require('../models/user')
 const router = Router()
 
 router.put(
 	'/signup',
+	isAuth,
 	[
 		body('email')
 			.isEmail()
@@ -26,6 +33,15 @@ router.put(
 	signup
 )
 
-router.post('/login', login)
+router.post('/login', isAuth, login)
+
+router.get('/status', isAuth, getUserStatus)
+
+router.patch(
+	'/status',
+	isAuth,
+	[body('status').trim().not().isEmpty()],
+	updateUserStatus
+)
 
 module.exports = router
