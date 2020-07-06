@@ -14,7 +14,7 @@ const router = Router()
 
 router.put(
 	'/signup',
-	isAuth,
+
 	[
 		body('email')
 			.isEmail()
@@ -33,7 +33,7 @@ router.put(
 	signup
 )
 
-router.post('/login', isAuth, login)
+router.post('/login', login)
 
 router.get('/status', isAuth, getUserStatus)
 
