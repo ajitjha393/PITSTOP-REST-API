@@ -14,6 +14,7 @@ exports.getPosts = async (req, res, next) => {
 		let totalItems = await Post.find().countDocuments()
 
 		const posts = await Post.find()
+			.populate('creator')
 			.skip((currentPage - 1) * perPage)
 			.limit(perPage)
 
@@ -67,7 +68,10 @@ exports.postAddPost = async (req, res, next) => {
 		user.posts.push(resPost)
 		await user.save()
 
-		io.getIO().emit('posts', { action: 'create', post: resPost })
+		io.getIO().emit('posts', {
+			action: 'create',
+			post: { ...resPost, creator: { _id: req.userId, name: user.name } },
+		})
 
 		// 201 Success in creating a resource in backend
 		return res.status(201).json({
