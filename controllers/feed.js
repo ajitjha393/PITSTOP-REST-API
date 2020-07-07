@@ -3,6 +3,7 @@ const Post = require('../models/post')
 const User = require('../models/user')
 const path = require('path')
 const fs = require('fs')
+const io = require('../socket')
 
 exports.getPosts = async (req, res, next) => {
 	// 200 means success
@@ -13,6 +14,8 @@ exports.getPosts = async (req, res, next) => {
 		let totalItems = await Post.find().countDocuments()
 
 		const posts = await Post.find()
+			.populate('creator')
+			.sort({ createdAt: -1 })
 			.skip((currentPage - 1) * perPage)
 			.limit(perPage)
 
@@ -65,6 +68,15 @@ exports.postAddPost = async (req, res, next) => {
 
 		user.posts.push(resPost)
 		await user.save()
+
+		// Emitting create post event to all real-time-clients connected via websockets
+		io.getIO().emit('posts', {
+			action: 'create',
+			post: {
+				...resPost._doc,
+				creator: { _id: req.userId, name: user.name },
+			},
+		})
 
 		// 201 Success in creating a resource in backend
 		return res.status(201).json({
@@ -132,14 +144,15 @@ exports.updatePost = async (req, res, next) => {
 	}
 
 	try {
-		const post = await Post.findById(postId)
+		// We use populate because we have userdata ref in creator
+		const post = await Post.findById(postId).populate('creator')
 		if (!post) {
 			const err = new Error('Could Not Find a post.')
 			err.statusCode = 404
 			throw err
 		}
 
-		if (post.creator.toString() !== req.userId.toString()) {
+		if (post.creator._id.toString() !== req.userId.toString()) {
 			const err = new Error('Not Authorized for Editing This Product')
 			err.statusCode = 403 //Operation forbidden
 			throw err
@@ -153,6 +166,12 @@ exports.updatePost = async (req, res, next) => {
 		post.imageUrl = imageUrl
 
 		const result = await post.save()
+
+		// Emitting update post event to all real-time-clients connected via websockets
+		io.getIO().emit('posts', {
+			action: 'update',
+			post: result,
+		})
 
 		return res.status(200).json({
 			message: 'Post Updated',
@@ -190,6 +209,11 @@ exports.deletePost = async (req, res, next) => {
 		console.log(user, user.posts)
 		user.posts.pull(postId)
 		await user.save()
+
+		io.getIO().emit('posts', {
+			action: 'delete',
+			post: result,
+		})
 
 		return res.status(200).json({
 			message: 'Post Deleted Successfully',

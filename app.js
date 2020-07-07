@@ -74,9 +74,15 @@ console.log(credentials)
 mongoose
 	.connect(credentials)
 	.then((_) => {
-		app.listen(8080, 'localhost', () => {
+		const server = app.listen(8080, 'localhost', () => {
 			console.clear()
-			console.log('Connnected')
+			console.log('Server Listening to port...')
+		})
+
+		// This uses our http server to establish websocket
+		const io = require('./socket').init(server)
+		io.on('connection', (socket) => {
+			console.log('[Websocket] Client connected...')
 		})
 	})
 	.catch((err) => console.log(err))
