@@ -15,6 +15,7 @@ exports.getPosts = async (req, res, next) => {
 
 		const posts = await Post.find()
 			.populate('creator')
+			.sort({ createdAt: -1 })
 			.skip((currentPage - 1) * perPage)
 			.limit(perPage)
 
@@ -71,7 +72,10 @@ exports.postAddPost = async (req, res, next) => {
 		// Emitting create post event to all real-time-clients connected via websockets
 		io.getIO().emit('posts', {
 			action: 'create',
-			post: { ...resPost, creator: { _id: req.userId, name: user.name } },
+			post: {
+				...resPost._doc,
+				creator: { _id: req.userId, name: user.name },
+			},
 		})
 
 		// 201 Success in creating a resource in backend
