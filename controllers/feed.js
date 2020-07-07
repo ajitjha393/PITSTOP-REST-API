@@ -68,6 +68,7 @@ exports.postAddPost = async (req, res, next) => {
 		user.posts.push(resPost)
 		await user.save()
 
+		// Emitting create post event to all real-time-clients connected via websockets
 		io.getIO().emit('posts', {
 			action: 'create',
 			post: { ...resPost, creator: { _id: req.userId, name: user.name } },
@@ -139,14 +140,15 @@ exports.updatePost = async (req, res, next) => {
 	}
 
 	try {
-		const post = await Post.findById(postId)
+		// We use populate because we have userdata ref in creator
+		const post = await Post.findById(postId).populate('creator')
 		if (!post) {
 			const err = new Error('Could Not Find a post.')
 			err.statusCode = 404
 			throw err
 		}
 
-		if (post.creator.toString() !== req.userId.toString()) {
+		if (post.creator._id.toString() !== req.userId.toString()) {
 			const err = new Error('Not Authorized for Editing This Product')
 			err.statusCode = 403 //Operation forbidden
 			throw err
@@ -160,6 +162,12 @@ exports.updatePost = async (req, res, next) => {
 		post.imageUrl = imageUrl
 
 		const result = await post.save()
+
+		// Emitting update post event to all real-time-clients connected via websockets
+		io.getIO().emit('posts', {
+			action: 'update',
+			post: result,
+		})
 
 		return res.status(200).json({
 			message: 'Post Updated',
